@@ -44,9 +44,9 @@ export class Mote<
     this.id(ulid());
   }
 
-  public appendTo(selector: selectorString | HTMLElement) {
+  public appendTo(selector: selectorString | HTMLElement | ShadowRoot) {
     // If it's a HTMLElement, append to it
-    if (selector instanceof HTMLElement) return selector.appendChild(this.element);
+    if (selector instanceof HTMLElement || selector instanceof ShadowRoot) return selector.appendChild(this.element);
     // If it's a string, find the element and append to it
     const target = document.querySelector(selector);
     if (!target) throw new Error(`[Mote] ~> ${this.element.tagName} |ERROR| Could not find element with selector ${selector}`);
