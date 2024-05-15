@@ -1,0 +1,48 @@
+{
+  "name": "@magik_io/mote",
+  "version": "1.0.0",
+  "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
+  "engines": {
+    "node": "21.*.*",
+    "npm": "10.*.*"
+  },
+  "scripts": {
+    "bundle": "esbuild src/index.ts --bundle --minify --sourcemap --outfile=dist/index.js && tsc --declaration --emitDeclarationOnly --declarationDir dist",
+    "publish": "npm publish --access public"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "@magik_io/lint_golem": "^2.1.1",
+    "@types/node": "^20.12.12",
+    "esbuild": "^0.21.2",
+    "eslint": "^9.2.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.9.0"
+  },
+  "authors": [
+    {
+      "name": "Antonio B.",
+      "email": "Abourassa@AssetVal.com",
+      "github": "https://github.com/Abourass"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MagikIO/mote.git"
+  },
+  "browserslist": [
+    "last 2 version",
+    "> 1%"
+  ],
+  "license": "MIT",
+  "packageManager": "yarn@4.2.2",
+  "dependencies": {
+    "ulid": "^2.3.0"
+  }
+}
