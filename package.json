@@ -1,6 +1,6 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
   "engines": {
     "node": "21.*.*",
@@ -14,36 +14,43 @@
   "files": [
     "dist"
   ],
+  "main": "dist/Mote.cjs",
+  "module": "dist/Mote.js",
+  "types": "dist/Mote.d.ts",
   "exports": {
-    "All": {
-      "import": {
-        "default": "./dist/All.js",
-        "types": "./dist/All.d.ts"
-      },
-      "require": {
-        "default": "./dist/All.cjs",
-        "types": "./dist/All.d.ts"
-      }
+    "*": {
+      "import": "./dist/Mote.js",
+      "require": "./dist/Mote.cjs"
     },
     "Mote": {
-      "import": {
-        "default": "./dist/Mote.js",
-        "types": "./dist/Mote.d.ts"
-      },
-      "require": {
-        "default": "./dist/Mote.cjs",
-        "types": "./dist/Mote.d.ts"
-      }
+      "import": "./dist/Mote.js",
+      "require": "./dist/Mote.cjs"
+    },
+    "All": {
+      "import": "./dist/All.js",
+      "require": "./dist/All.cjs"
     },
     "El": {
-      "import": {
-        "default": "./dist/El.js",
-        "types": "./dist/El.d.ts"
-      },
-      "require": {
-        "default": "./dist/El.cjs",
-        "types": "./dist/El.d.ts"
-      }
+      "import": "./dist/El.js",
+      "require": "./dist/El.cjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/Mote.d.ts",
+        "dist/El.d.ts",
+        "dist/All.d.ts"
+      ],
+      "El": [
+        "dist/El.d.ts"
+      ],
+      "Mote": [
+        "dist/Mote.d.ts"
+      ],
+      "All": [
+        "dist/All.d.ts"
+      ]
     }
   },
   "dependencies": {
