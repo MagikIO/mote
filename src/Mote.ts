@@ -1,6 +1,8 @@
-import { ulid } from 'ulid'
-import { El } from './El';
-import type { selectorString, htmlTags } from '../types';
+import * as ULID from 'ulid'
+import { El } from './El.js';
+import type { selectorString, htmlTags } from '../types/index.js';
+
+const ulid = ULID.ulid;
 
 export type IDdElementName = `${htmlTags}#${string}`;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,7 +48,7 @@ export class Mote<
 
   public appendTo(selector: selectorString | HTMLElement | ShadowRoot) {
     // If it's a HTMLElement, append to it
-    if (selector instanceof HTMLElement || selector instanceof ShadowRoot){
+    if (selector instanceof HTMLElement || selector instanceof ShadowRoot) {
       selector.appendChild(this.element);
       return this;
     };

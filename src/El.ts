@@ -1,4 +1,4 @@
-import type { idString, selectorString, GenericEvent, TagEventMap } from '../types';
+import type { idString, selectorString, GenericEvent, TagEventMap } from '../types/index.js';
 
 export class El<ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap, StrictTypes extends boolean = false> {
   element: HTMLElementTagNameMap[ElementName];

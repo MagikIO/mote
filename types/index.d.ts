@@ -1,4 +1,5 @@
-export declare type htmlTags = keyof HTMLElementTagNameMap
+
+export type htmlTags = keyof HTMLElementTagNameMap
 export type idString<id extends string = string> = `#${id}`;
 export type classString<className extends string = string> = `.${className}`;
 export type advSelectorString = `[${string}]`;
