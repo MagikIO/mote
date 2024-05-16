@@ -1,6 +1,6 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
   "engines": {
     "node": "21.*.*",
@@ -11,16 +11,39 @@
     "publish": "npm publish --access public"
   },
   "type": "module",
-  "main": "dist/mote.umd.cjs",
-  "module": "dist/mote.js",
   "files": [
     "dist"
   ],
-  "types": "dist/M.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/mote.js",
-      "require": "./dist/mote.umd.cjs"
+    "All": {
+      "import": {
+        "default": "./dist/All.js",
+        "types": "./dist/All.d.ts"
+      },
+      "require": {
+        "default": "./dist/All.cjs",
+        "types": "./dist/All.d.ts"
+      }
+    },
+    "Mote": {
+      "import": {
+        "default": "./dist/Mote.js",
+        "types": "./dist/Mote.d.ts"
+      },
+      "require": {
+        "default": "./dist/Mote.cjs",
+        "types": "./dist/Mote.d.ts"
+      }
+    },
+    "El": {
+      "import": {
+        "default": "./dist/El.js",
+        "types": "./dist/El.d.ts"
+      },
+      "require": {
+        "default": "./dist/El.cjs",
+        "types": "./dist/El.d.ts"
+      }
     }
   },
   "dependencies": {
