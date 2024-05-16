@@ -13,6 +13,7 @@ export default defineConfig({
         join(src, 'All.ts'),
         join(src, 'Mote.ts'),
         join(src, 'El.ts'),
+        join(src, 'index.ts'),
       ],
       name: 'Mote',
     },
