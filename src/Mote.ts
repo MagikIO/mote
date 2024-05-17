@@ -37,12 +37,13 @@ export class Mote<
       }
 
       // Invoke El constructor
-      super(tagName)
+      super(() => document.createElement(tagName));
       // Set the id
       this.id(id);
+      return;
     }
     // If it's not an IDd element, generate a new ID and use it
-    super(selector)
+    super(() => document.createElement(selector) as HTMLElementTagNameMap[ExtractedElementName<ElementName>]);
     this.id(ulid());
   }
 

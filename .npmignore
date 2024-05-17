@@ -1,8 +1,14 @@
 /src/**/*
+/test/**/*
 .pnp.*
 .yarn
 .vscode
 tsconfig.json
-eslint.config.mjs
+eslint.config.js
 .editorconfig
 .gitattributes
+index.html
+.yarnrc.yml
+vite.config.*
+node_modules
+.vscode

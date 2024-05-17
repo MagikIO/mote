@@ -1,13 +1,15 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.5.3",
+  "version": "1.5.5",
   "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
   "engines": {
     "node": "21.*.*",
     "npm": "10.*.*"
   },
   "scripts": {
-    "build": "vite build --mode production",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "publish": "npm publish --access public"
   },
   "type": "module",
@@ -49,7 +51,8 @@
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.9.0",
     "vite": "^5.2.11",
-    "vite-plugin-dts": "^3.9.1"
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.6.0"
   },
   "authors": [
     {

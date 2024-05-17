@@ -1,6 +1,9 @@
 import type { idString, selectorString, GenericEvent, TagEventMap } from '../types/index.js';
 
-export class El<ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap, StrictTypes extends boolean = false> {
+export class El<
+  ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap,
+  StrictTypes extends boolean = false
+> {
   element: HTMLElementTagNameMap[ElementName];
   debug = false;
 
@@ -8,11 +11,20 @@ export class El<ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElem
    * Create a new instance of El.
    * @param {selectorString} selector - The CSS selector for the HTML element.
    */
-  constructor(selector: selectorString) {
-    const element = document.querySelector(selector);
-    if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
+  constructor(selector: selectorString | HTMLElementTagNameMap[ElementName] | (() => HTMLElementTagNameMap[ElementName])) {
+    if (typeof selector === 'string') {
+      const element = document.querySelector(selector);
+      if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
 
-    this.element = element as HTMLElementTagNameMap[ElementName];
+      this.element = element as HTMLElementTagNameMap[ElementName];
+      return;
+    }
+    if (typeof selector === 'function') {
+      this.element = selector() as HTMLElementTagNameMap[ElementName];
+      return;
+    }
+
+    this.element = selector;
   }
 
   /**
