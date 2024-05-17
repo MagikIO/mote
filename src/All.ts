@@ -1,21 +1,21 @@
 import type { GenericEvent, TagEventMap, multiSelectString, htmlTags } from '../types/index.js';
 
 export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
-  elements: NodeListOf<HTMLElementTagNameMap[E]>;
-  debug = false;
+  public elements: NodeListOf<HTMLElementTagNameMap[E]>;
+  public debug = false;
 
   constructor(tempSelector: multiSelectString) {
     this.elements = document.querySelectorAll<HTMLElementTagNameMap[E]>(tempSelector);
   }
 
-  each<CoerceTo extends htmlTags = E>(callback: (element: HTMLElementTagNameMap[CoerceTo], index: number) => void) {
+  public each<CoerceTo extends htmlTags = E>(callback: (element: HTMLElementTagNameMap[CoerceTo], index: number) => void) {
     this.elements.forEach((element, index) => {
       callback(element as unknown as HTMLElementTagNameMap[CoerceTo], index);
     });
     return this;
   }
 
-  log(formatToTreeView = false) {
+  public log(formatToTreeView = false) {
     if (this.debug) {
       if (formatToTreeView) {
         console.log(this.elements);
@@ -26,27 +26,27 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     return this;
   }
 
-  attr(attribute: string, value: string) {
+  public attr(attribute: string, value: string) {
     this.elements.forEach((element) => {
       element.setAttribute(attribute, value);
     });
     return this;
   }
 
-  data(dataName: string, value: string) {
+  public data(dataName: string, value: string) {
     this.elements.forEach((element) => {
       element.dataset[dataName] = value;
     });
     return this;
   }
 
-  toggleClass(className: string) {
+  public toggleClass(className: string) {
     this.elements.forEach((element) => {
       element.classList.toggle(className);
     });
     return this;
   }
-  addClass(className: Array<string> | string) {
+  public addClass(className: Array<string> | string) {
     this.elements.forEach((element) => {
       if (Array.isArray(className)) {
         className.forEach((singleClass: string): void => element.classList.add(singleClass));
@@ -56,7 +56,7 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  removeClass(className: string[] | string) {
+  public removeClass(className: string[] | string) {
     this.elements.forEach((element) => {
       if (Array.isArray(className)) {
         className.forEach((singleClass: string): void => element.classList.remove(singleClass));
@@ -66,25 +66,25 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  replaceWith(string: string) {
+  public replaceWith(string: string) {
     this.elements.forEach((element) => {
       element.outerHTML = string;
     });
     return this;
   }
-  html(string: string) {
+  public html(string: string) {
     this.elements.forEach((element) => {
       element.innerHTML = string;
     });
     return this;
   }
-  empty() {
+  public empty() {
     this.elements.forEach((element) => {
       element.innerHTML = '';
     });
     return this;
   }
-  click() {
+  public click() {
     this.elements.forEach((element) => {
       element.dispatchEvent(
         new MouseEvent('click', { view: window, bubbles: true, cancelable: false }),
@@ -92,7 +92,7 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  wrap(classForDiv: string) {
+  public wrap(classForDiv: string) {
     this.elements.forEach((element) => {
       const wrapper: HTMLDivElement = document.createElement('div');
       wrapper.className = classForDiv;
@@ -102,29 +102,29 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  self() {
+  public self() {
     return this.elements;
   }
-  src(srcString: string) {
+  public src(srcString: string) {
     this.elements.forEach((element) => {
       const input = element as HTMLInputElement;
       input.src = srcString;
     });
     return this;
   }
-  remove() {
+  public remove() {
     this.elements.forEach((element) => {
       element.parentNode?.removeChild(element);
     });
     return this;
   }
-  clear() {
+  public clear() {
     this.elements.forEach((element) => {
       element.innerHTML = '';
     });
     return this;
   }
-  set(setObj: Record<string, string | number | boolean>) {
+  public set(setObj: Record<string, string | number | boolean>) {
     this.elements.forEach((element) => {
       Object.keys(setObj).forEach((key: string): void => {
         element.setAttribute(key, setObj[key].toString());
@@ -132,7 +132,7 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  unset(properties: Array<string>) {
+  public unset(properties: Array<string>) {
     this.elements.forEach((element) => {
       properties.forEach((key: string): void => {
         element.removeAttribute(key);
@@ -140,52 +140,52 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  child(HTMLElement: HTMLElement, insertAt: 'append' | 'prepend' | null = null) {
+  public child(HTMLElement: HTMLElement, insertAt: 'append' | 'prepend' | null = null) {
     this.elements.forEach((element) => {
       if (insertAt === 'append' || insertAt == null) { element.append(HTMLElement); }
       if (insertAt === 'prepend') { element.prepend(HTMLElement); }
     });
     return this;
   }
-  text(txt: any) {
+  public text(txt: any) {
     this.elements.forEach((element) => {
       element.textContent = txt.toString();
     });
     return this;
   }
-  textChild(string: string) {
+  public textChild(string: string) {
     this.elements.forEach((element) => {
       const textEl: Text = document.createTextNode(string.toString());
       element.appendChild(textEl);
     });
     return this;
   }
-  type(type: string) {
+  public type(type: string) {
     this.elements.forEach((element) => {
       (element as HTMLInputElement).type = type;
     });
     return this;
   }
-  name(name: string) {
+  public name(name: string) {
     this.elements.forEach((element) => {
       (element as HTMLInputElement).name = name;
     });
     return this;
   }
-  input(type: string) {
+  public input(type: string) {
     this.elements.forEach((element) => {
       (element as HTMLInputElement).name = element.id;
       (element as HTMLInputElement).type = type;
     });
     return this;
   }
-  htmlFor(elementTheLabelIsFor: string) {
+  public htmlFor(elementTheLabelIsFor: string) {
     this.elements.forEach((element) => {
       (element as HTMLLabelElement).htmlFor = elementTheLabelIsFor;
     });
     return this;
   }
-  val<Value extends string | number | boolean = string | number | boolean>(newVal?: Value) {
+  public val<Value extends string | number | boolean = string | number | boolean>(newVal?: Value) {
     this.elements.forEach((element) => {
       if (element instanceof HTMLInputElement
         || element instanceof HTMLSelectElement
@@ -205,7 +205,7 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
    * @param {boolean | AddEventListenerOptions} options - The options for the event listener.
    * @returns {this} The current instance for chaining.
    */
-  on<Data = undefined, EventType extends keyof TagEventMap = keyof TagEventMap>(
+  public on<Data = undefined, EventType extends keyof TagEventMap = keyof TagEventMap>(
     event: EventType,
     listener: (e: GenericEvent<Data>) => void | Promise<void>,
     options?: boolean | AddEventListenerOptions
@@ -215,7 +215,7 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  once<Data = undefined, EventType extends keyof TagEventMap = keyof TagEventMap>(
+  public once<Data = undefined, EventType extends keyof TagEventMap = keyof TagEventMap>(
     event: EventType,
     listener: (e: GenericEvent<Data>) => void | Promise<void>,
     options?: AddEventListenerOptions
@@ -226,13 +226,13 @@ export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
     });
     return this;
   }
-  off(eventName: string, eventHandler: (e: GenericEvent) => void | Promise<void>) {
+  public off(eventName: string, eventHandler: (e: GenericEvent) => void | Promise<void>) {
     this.elements.forEach((element) => {
       (element as HTMLElement).removeEventListener(eventName, eventHandler as EventListener);
     });
     return this;
   }
-  now(eventName: string, detail: any) {
+  public now(eventName: string, detail: any) {
     this.elements.forEach((element) => {
       element.dispatchEvent(new CustomEvent(eventName, {
         detail: detail,

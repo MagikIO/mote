@@ -16,7 +16,8 @@ export default defineConfig({
         join(src, 'index.ts'),
       ],
       name: 'Mote',
+      formats: ['es'],
     },
   },
-  plugins: [dtsPlugin({ bundledPackages: true })],
+  plugins: [dtsPlugin()],
 })

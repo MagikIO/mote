@@ -1,6 +1,6 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
   "engines": {
     "node": "21.*.*",
@@ -9,40 +9,32 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
     "publish": "npm publish --access public"
   },
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
     "./Mote": {
       "import": "./dist/Mote.js",
-      "require": "./dist/Mote.cjs",
       "types": "./dist/Mote.d.ts"
     },
     "./All": {
       "import": "./dist/All.js",
-      "require": "./dist/All.cjs",
       "types": "./dist/All.d.ts"
     },
     "./El": {
       "import": "./dist/El.js",
-      "require": "./dist/El.cjs",
       "types": "./dist/El.d.ts"
     }
-  },
-  "dependencies": {
-    "ulid": "^2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",

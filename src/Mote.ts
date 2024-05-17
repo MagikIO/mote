@@ -1,8 +1,5 @@
-import * as ULID from 'ulid'
+import type { htmlTags, selectorString } from '../types/index.js';
 import { El } from './El.js';
-import type { selectorString, htmlTags } from '../types/index.js';
-
-const ulid = ULID.ulid;
 
 export type IDdElementName = `${htmlTags}#${string}`;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,7 +41,6 @@ export class Mote<
     }
     // If it's not an IDd element, generate a new ID and use it
     super(() => document.createElement(selector) as HTMLElementTagNameMap[ExtractedElementName<ElementName>]);
-    this.id(ulid());
   }
 
   public appendTo(selector: selectorString | HTMLElement | ShadowRoot) {
