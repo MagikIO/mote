@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "publish": "npm publish --access public"
+    "iterate": "npm version patch && git push origin main --tags && npm publish --access public"
   },
   "type": "module",
   "files": [

@@ -43,9 +43,13 @@ export class Mote<
     super(() => document.createElement(selector) as HTMLElementTagNameMap[ExtractedElementName<ElementName>]);
   }
 
-  public appendTo(selector: selectorString | HTMLElement | ShadowRoot) {
+  public appendTo(selector: selectorString | HTMLElement | ShadowRoot | DocumentFragment | Document) {
     // If it's a HTMLElement, append to it
-    if (selector instanceof HTMLElement || selector instanceof ShadowRoot) {
+    if (
+      (selector instanceof HTMLElement || selector instanceof HTMLTemplateElement)
+      || selector instanceof ShadowRoot
+      || selector instanceof DocumentFragment
+      || selector instanceof Document) {
       selector.appendChild(this.element);
       return this;
     };
