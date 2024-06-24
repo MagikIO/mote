@@ -1,6 +1,6 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
   "engines": {
     "node": "21.*.*",
