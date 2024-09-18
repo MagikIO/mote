@@ -1,37 +1,56 @@
-import type { idString, selectorString, GenericEvent, TagEventMap } from '../types/index.js';
+import type { idString, selectorString, GenericEvent, TagEventMap, htmlTags, htmlElements } from '../types/index.js';
+
+function isAElement(selector: string | Node | Element | htmlElements | (() => any)): selector is htmlElements {
+  return (selector instanceof HTMLElement);
+}
 
 export class El<
-  ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap,
+  ElementName extends htmlTags = htmlTags,
   StrictTypes extends boolean = false
 > {
-  element: HTMLElementTagNameMap[ElementName];
+  element: htmlElements<ElementName>;
   debug = false;
 
   /**
    * Create a new instance of El.
    * @param {selectorString} selector - The CSS selector for the HTML element.
    */
-  constructor(selector: selectorString | HTMLElementTagNameMap[ElementName] | (() => HTMLElementTagNameMap[ElementName])) {
-    if (typeof selector === 'string') {
-      const element = document.querySelector(selector);
-      if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
-
-      this.element = element as HTMLElementTagNameMap[ElementName];
+  constructor(selector: selectorString | htmlElements<ElementName> | (() => htmlElements<ElementName>) | (() => htmlTags) | (() => selectorString)) {
+    if (isAElement(selector)) {
+      this.element = selector as htmlElements<ElementName>;
       return;
     }
+
     if (typeof selector === 'function') {
-      this.element = selector() as HTMLElementTagNameMap[ElementName];
-      return;
+      const t = selector();
+      if (!t) throw new Error('Function must return an element');
+      if (this.debug) console.log('Function returned', t);
+      if (isAElement(t)) {
+        this.element = t as htmlElements<ElementName>;
+        return;
+      }
+      if (typeof t === 'string') {
+        const element = document.querySelector(t) as htmlElements<ElementName>;
+        if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
+
+        this.element = element as htmlElements<ElementName>;
+        return;
+      }
     }
 
-    this.element = selector;
+
+    const element = document.querySelector(selector as selectorString) as htmlElements<ElementName>;
+    if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
+
+    this.element = element as htmlElements<ElementName>;
+    return;
   }
 
   /**
   * Get the current HTML element.
-  * @returns {HTMLElementTagNameMap[ElementName]} The current HTML element.
+  * @returns {htmlElements<ElementName>} The current HTML element.
   */
-  self(): HTMLElementTagNameMap[ElementName] {
+  self(): htmlElements<ElementName> {
     return this.element;
   }
 
@@ -50,10 +69,10 @@ export class El<
   }
 
   /**
- * Add a class or classes to the current HTML element.
- * @param {Array<string> | string | (() => string) | (() => Array<string>)} className - The class or classes to add.
- * @returns {this} The current instance for chaining.
- */
+  * Add a class or classes to the current HTML element.
+  * @param {Array<string> | string | (() => string) | (() => Array<string>)} className - The class or classes to add.
+  * @returns {this} The current instance for chaining.
+  */
   addClass(className: Array<string> | string | (() => string) | (() => Array<string>)): this {
     if (typeof className === 'function') className = className();
     if (typeof className === 'string' && className.includes(' ')) className = className.split(' ');
@@ -89,10 +108,10 @@ export class El<
   }
 
   /**
- * Replace the current HTML element with a string.
- * @param {string} string - The string to replace the element with.
- * @returns {this} The current instance for chaining.
- */
+  * Replace the current HTML element with a string.
+  * @param {string} string - The string to replace the element with.
+  * @returns {this} The current instance for chaining.
+  */
   replaceWith(string: string): this {
     this.element.outerHTML = string;
     return this;
@@ -105,7 +124,7 @@ export class El<
    * @param {string | undefined} idForNewElement - The id for the new element.
    * @returns {El<NewElement>} A new instance of El for the new element.
    */
-  replaceWithElement<NewElement extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap>(tagName: NewElement, idForNewElement: string | undefined = undefined): El<NewElement> {
+  replaceWithElement<NewElement extends htmlTags = htmlTags>(tagName: NewElement, idForNewElement: string | undefined = undefined): El<NewElement> {
     const newEl = document.createElement<NewElement>(tagName);
     newEl.id = idForNewElement ?? this.element.id;
     if (!this.element?.parentNode) throw new Error('Element has no parent node, can not replace');
@@ -133,11 +152,11 @@ export class El<
   }
 
   /**
- * Check or uncheck the current HTML element if it is an input element.
- * @param {boolean} trueOrFalse - Whether to check or uncheck the element.
- * @returns {this} The current instance for chaining.
- * @throws {TypeError} If the current HTML element is not an input element.
- */
+  * Check or uncheck the current HTML element if it is an input element.
+  * @param {boolean} trueOrFalse - Whether to check or uncheck the element.
+  * @returns {this} The current instance for chaining.
+  * @throws {TypeError} If the current HTML element is not an input element.
+  */
   check(trueOrFalse: boolean): this {
     if (this.element instanceof HTMLInputElement) {
       this.element.checked = trueOrFalse;
@@ -147,10 +166,10 @@ export class El<
   }
 
   /**
- * Get whether the current HTML element is checked if it is an input element.
- * @returns {boolean} Whether the element is checked.
- * @throws {TypeError} If the current HTML element is not an input element.
- */
+  * Get whether the current HTML element is checked if it is an input element.
+  * @returns {boolean} Whether the element is checked.
+  * @throws {TypeError} If the current HTML element is not an input element.
+  */
   checked(): boolean {
     if (this.element instanceof HTMLInputElement) return this.element.checked;
     throw new TypeError(`[El::${this.element.id}] You can only use checked() on input elements'`);
@@ -168,10 +187,10 @@ export class El<
   }
 
   /**
- * Return the current instance if the expression is true, otherwise return undefined, useful for chaining
- * @param {boolean} expression - The expression to evaluate.
- * @returns {this | undefined} The current instance if the expression is true, otherwise null.
- */
+  * Return the current instance if the expression is true, otherwise return undefined, useful for chaining
+  * @param {boolean} expression - The expression to evaluate.
+  * @returns {this | undefined} The current instance if the expression is true, otherwise null.
+  */
   if<Expression extends boolean = boolean>(expression: Expression): Expression extends true ? this : null {
     return (expression)
       ? (this as Expression extends true ? this : never)
@@ -227,7 +246,7 @@ export class El<
    * Returns the parent element of the current HTML element.
    * @returns El<ElementName, StrictTypes>
    */
-  parent<ElementTag extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap>(): El<ElementTag, true> {
+  parent<ElementTag extends htmlTags = htmlTags>(): El<ElementTag, true> {
     const parentElement = this.element.parentElement as HTMLDivElement
     if (!parentElement) throw new Error('Element has no parent node, can not get parent');
     if (!parentElement.id) parentElement.id = `parent-${this.element.id}`;
@@ -330,10 +349,10 @@ export class El<
   }
 
   /**
- * Set the text content of the current HTML element.
- * @param {string} content - The text content to set.
- * @returns {this} The current instance for chaining.
- */
+  * Set the text content of the current HTML element.
+  * @param {string} content - The text content to set.
+  * @returns {this} The current instance for chaining.
+  */
   textContent(content: string): this;
   /**
    * Get the text content of the current HTML element.
@@ -385,10 +404,10 @@ export class El<
   }
 
   /**
- * Set the type attribute of the current HTML element.
- * @param {string} type - The type attribute to set.
- * @returns {this} The current instance for chaining.
- */
+  * Set the type attribute of the current HTML element.
+  * @param {string} type - The type attribute to set.
+  * @returns {this} The current instance for chaining.
+  */
   input(type: string): this {
     if ('name' in this.element) this.element.name = this.element.id;
     if ('type' in this.element) this.element.setAttribute('type', type);
@@ -424,10 +443,10 @@ export class El<
    */
   id<ID extends undefined>(idForEl: ID): string;
   /**
- * Set or retrieving the id attribute of the current HTML element.
- * @param {string | undefined} idForEl - The id attribute to set.
- * @returns {this | string} The current instance for chaining or the id value.
- */
+  * Set or retrieving the id attribute of the current HTML element.
+  * @param {string | undefined} idForEl - The id attribute to set.
+  * @returns {this | string} The current instance for chaining or the id value.
+  */
   id<ID extends string | undefined = undefined>(idForEl?: ID): ID extends undefined ? string : this {
     if (!idForEl) return this.element.id as ID extends undefined ? string : never;
 
@@ -511,11 +530,11 @@ export class El<
   }
 
   /**
- * Dispatch a custom event on the current HTML element.
- * @param {string} eventName - The name of the event to dispatch.
- * @param {any} detail - The event detail.
- * @returns {this} The current instance for chaining.
- */
+  * Dispatch a custom event on the current HTML element.
+  * @param {string} eventName - The name of the event to dispatch.
+  * @param {any} detail - The event detail.
+  * @returns {this} The current instance for chaining.
+  */
   now(eventName: string, detail: any): this {
     this.element.dispatchEvent(new CustomEvent(eventName, {
       detail: detail,
@@ -548,9 +567,9 @@ export class El<
   }
 
   /**
- * Trigger a change event on the current HTML element.
- * @returns {this} The current instance for chaining.
- */
+  * Trigger a change event on the current HTML element.
+  * @returns {this} The current instance for chaining.
+  */
   triggerChange(): this {
     if (this.element instanceof HTMLSelectElement) {
       const event = document.createEvent('HTMLEvents');
@@ -591,9 +610,9 @@ export class El<
   }
 }
 
-export function el<ElementName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap, StrictTypes extends boolean = false>(selector: selectorString): El<ElementName, StrictTypes> {
+export function el<ElementName extends htmlTags = htmlTags, StrictTypes extends boolean = false>(selector: selectorString): El<ElementName, StrictTypes> {
   return new El<ElementName, StrictTypes>(selector);
 }
 
-export type toolsInterface<HTMLTagName extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap> = ReturnType<typeof el<HTMLTagName>>;
+export type toolsInterface<HTMLTagName extends htmlTags = htmlTags> = ReturnType<typeof el<HTMLTagName>>;
 

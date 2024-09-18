@@ -11,9 +11,13 @@
   <div id="target"></div>
 </body>
 <script type="module">
-  import { Mote } from './src/index.ts'
+  import { Mote, El } from './src/index.ts'
 
-  new Mote('input').appendTo('#target')
+  const i = new Mote('input').set({
+    id: 'test',
+  }).appendTo('#target')
+
+  new El(i.element).set({ value: 'Hello World' })
 </script>
 
 </html>

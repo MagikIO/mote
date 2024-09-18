@@ -1,5 +1,17 @@
+export type htmlTags = Exclude<keyof HTMLElementTagNameMap, 'object'>
+export type htmlElements<T extends htmlTags = htmlTags> = HTMLElementTagNameMap[T];
 
-export type htmlTags = keyof HTMLElementTagNameMap
+export type elementExtractedViaTag<Tag extends htmlTags> = HTMLElementTagNameMap[Tag];
+type KeyOfValue<T, V> = {
+  [K in keyof T]: T[K] extends V ? K : never
+}[keyof T];
+/**
+ * Doesn't work very well cause most elements are HTMLElements
+ */
+export type elementTagExtractedViaElement<T extends htmlElements> = KeyOfValue<HTMLElementTagNameMap, T>;
+
+type divName = elementTagExtractedViaElement<HTMLDivElement>; // 'div'
+
 export type idString<id extends string = string> = `#${id}`;
 export type classString<className extends string = string> = `.${className}`;
 export type advSelectorString = `[${string}]`;

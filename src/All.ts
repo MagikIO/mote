@@ -1,6 +1,6 @@
 import type { GenericEvent, TagEventMap, multiSelectString, htmlTags } from '../types/index.js';
 
-export class All<E extends keyof HTMLElementTagNameMap = 'input'> {
+export class All<E extends htmlTags = 'input'> {
   public elements: NodeListOf<HTMLElementTagNameMap[E]>;
   public debug = false;
 
