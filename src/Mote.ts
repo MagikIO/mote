@@ -1,6 +1,11 @@
 import type { htmlTags, selectorString } from '../types/index.js';
 import { El } from './El.js';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CustomHTMLElements {
+
+}
+
 export type IDdElementName = `${htmlTags}#${string}`;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ExtractedID<T extends htmlTags | IDdElementName = htmlTags | IDdElementName> = T extends `${infer _}#${infer ID}` ? ID : never;
@@ -11,7 +16,7 @@ function isIDdElementName(selector: string): selector is IDdElementName {
 }
 
 export const mote = <
-  ElementName extends htmlTags | IDdElementName = htmlTags | IDdElementName,
+  ElementName extends htmlTags | IDdElementName | keyof CustomHTMLElements = htmlTags | IDdElementName | keyof CustomHTMLElements,
   StrictMode extends boolean = true
 >(tagName: ElementName, appendTo: selectorString, fromWithin?: (id: selectorString) => void | Promise<void>) => {
   const m = new Mote<ElementName, StrictMode>(tagName)
