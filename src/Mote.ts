@@ -1,5 +1,6 @@
 import type { htmlTags, selectorString } from '../types/index.js';
 import { El } from './El.js';
+import { InvalidSelectorError, ElementNotFoundError } from './errors.js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CustomHTMLElements {
@@ -30,7 +31,7 @@ export class Mote<
   StrictMode extends boolean = true
 > extends El<ExtractedElementName<ElementName>, StrictMode> {
   constructor(selector: ElementName) {
-    if (typeof selector !== 'string') throw new Error(`[Mote] ~> |ERROR| Selector must be a string`, { cause: selector });
+    if (typeof selector !== 'string') throw new InvalidSelectorError(selector);
 
     if (isIDdElementName(selector)) {
       const { id, tagName } = {
@@ -60,7 +61,7 @@ export class Mote<
     };
     // If it's a string, find the element and append to it
     const target = document.querySelector(selector);
-    if (!target) throw new Error(`[Mote] ~> ${this.element.tagName} |ERROR| Could not find element with selector ${selector}`);
+    if (!target) throw new ElementNotFoundError(selector, 'Make sure the target element exists before appending');
     target.appendChild(this.element);
     return this;
   }

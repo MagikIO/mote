@@ -1,4 +1,5 @@
 import type { idString, selectorString, GenericEvent, TagEventMap, htmlTags, htmlElements } from '../types/index.js';
+import { ElementNotFoundError, InvalidElementTypeError, NoParentNodeError, InvalidReturnValueError } from './errors.js';
 
 function isAElement(selector: string | Node | Element | htmlElements | (() => any)): selector is htmlElements {
   return (selector instanceof HTMLElement);
@@ -23,7 +24,7 @@ export class El<
 
     if (typeof selector === 'function') {
       const t = selector();
-      if (!t) throw new Error('Function must return an element');
+      if (!t) throw new InvalidReturnValueError('an element or selector string');
       if (this.debug) console.log('Function returned', t);
       if (isAElement(t)) {
         this.element = t as htmlElements<ElementName>;
@@ -31,7 +32,7 @@ export class El<
       }
       if (typeof t === 'string') {
         const element = document.querySelector(t) as htmlElements<ElementName>;
-        if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
+        if (!element) throw new ElementNotFoundError(t);
 
         this.element = element as htmlElements<ElementName>;
         return;
@@ -40,7 +41,7 @@ export class El<
 
 
     const element = document.querySelector(selector as selectorString) as htmlElements<ElementName>;
-    if (!element) throw new Error(`You tried to grab using '${selector}' but that doesn't exist!`);
+    if (!element) throw new ElementNotFoundError(selector as string);
 
     this.element = element as htmlElements<ElementName>;
     return;
@@ -127,7 +128,7 @@ export class El<
   replaceWithElement<NewElement extends htmlTags = htmlTags>(tagName: NewElement, idForNewElement: string | undefined = undefined): El<NewElement> {
     const newEl = document.createElement<NewElement>(tagName);
     newEl.id = idForNewElement ?? this.element.id;
-    if (!this.element?.parentNode) throw new Error('Element has no parent node, can not replace');
+    if (!this.element?.parentNode) throw new NoParentNodeError('replace element', this.element.id);
     this.element.parentNode.replaceChild(newEl, this.element);
     return new El<NewElement>(`#${newEl.id}`);
   }
@@ -162,7 +163,7 @@ export class El<
       this.element.checked = trueOrFalse;
       return this;
     }
-    throw new TypeError(`[El::${this.element.id}] You can only use check() on input elements'`);
+    throw new InvalidElementTypeError('check', 'input', this.element.tagName.toLowerCase(), this.element.id);
   }
 
   /**
@@ -172,7 +173,7 @@ export class El<
   */
   checked(): boolean {
     if (this.element instanceof HTMLInputElement) return this.element.checked;
-    throw new TypeError(`[El::${this.element.id}] You can only use checked() on input elements'`);
+    throw new InvalidElementTypeError('checked', 'input', this.element.tagName.toLowerCase(), this.element.id);
   }
 
   /**
@@ -181,7 +182,7 @@ export class El<
    */
   click(): this {
     this.element.dispatchEvent(
-      new MouseEvent('click', { view: window, bubbles: true, cancelable: false }),
+      new MouseEvent('click', { bubbles: true, cancelable: false }),
     );
     return this;
   }
@@ -205,7 +206,7 @@ export class El<
   wrap(classForDiv: string): this {
     const wrapper = document.createElement('div');
     wrapper.className = classForDiv;
-    if (!this.element?.parentNode) throw new Error('Element has no parent node, can not wrap');
+    if (!this.element?.parentNode) throw new NoParentNodeError('wrap element', this.element.id);
     this.element.parentNode.insertBefore(wrapper, this.element);
     this.element.parentNode.removeChild(this.element);
     wrapper.appendChild(this.element);
@@ -222,7 +223,7 @@ export class El<
     if (this.element instanceof HTMLImageElement) {
       this.element.src = srcString;
     } else {
-      throw new TypeError(`[El::${this.element.id}] You can only use src() on image elements'`);
+      throw new InvalidElementTypeError('src', 'img', this.element.tagName.toLowerCase(), this.element.id);
     }
     return this;
   }
@@ -237,7 +238,7 @@ export class El<
     if (this.element instanceof HTMLImageElement) {
       this.element.alt = altString;
     } else {
-      throw new TypeError(`[El::${this.element.id}] You can only use alt() on image elements'`);
+      throw new InvalidElementTypeError('alt', 'img', this.element.tagName.toLowerCase(), this.element.id);
     }
     return this;
   }
@@ -248,7 +249,7 @@ export class El<
    */
   parent<ElementTag extends htmlTags = htmlTags>(): El<ElementTag, true> {
     const parentElement = this.element.parentElement as HTMLDivElement
-    if (!parentElement) throw new Error('Element has no parent node, can not get parent');
+    if (!parentElement) throw new NoParentNodeError('get parent element', this.element.id);
     if (!parentElement.id) parentElement.id = `parent-${this.element.id}`;
     return new El<ElementTag, true>(`#${parentElement?.id}`);
   }
@@ -258,7 +259,7 @@ export class El<
   * @returns {this} The current instance for chaining.
   */
   remove(): this {
-    if (!this.element?.parentNode) throw new Error('Element has no parent node, can not remove');
+    if (!this.element?.parentNode) throw new NoParentNodeError('remove element', this.element.id);
     this.element.parentNode.removeChild(this.element);
     return this;
   }
@@ -478,7 +479,7 @@ export class El<
       // return this
       return this as Value extends undefined ? string : this;
     }
-    throw new TypeError(`[El::${this.element.id}] You can only use val() on input / select / text area / progress elements'`);
+    throw new InvalidElementTypeError('val', 'input, select, textarea, or progress', this.element.tagName.toLowerCase(), this.element.id);
   }
 
   /**
@@ -577,7 +578,7 @@ export class El<
       this.element.dispatchEvent(event);
       return this;
     }
-    throw new TypeError(`[El::${this.element.id}] You can only use triggerChange() on select elements'`);
+    throw new InvalidElementTypeError('triggerChange', 'select', this.element.tagName.toLowerCase(), this.element.id);
   }
 
   /**
@@ -607,6 +608,308 @@ export class El<
   nestFrom(cb: (id: idString) => any): this {
     cb(`#${this.element.id}`);
     return this;
+  }
+
+  /**
+   * Get a computed CSS property value.
+   * @param {string} property - The CSS property name.
+   * @returns {string} The computed CSS property value.
+   */
+  css(property: string): string;
+  /**
+   * Set a single CSS property.
+   * @param {string} property - The CSS property name.
+   * @param {string | number} value - The CSS property value.
+   * @returns {this} The current instance for chaining.
+   */
+  css(property: string, value: string | number): this;
+  /**
+   * Set multiple CSS properties.
+   * @param {Record<string, string | number>} properties - Object containing CSS properties and values.
+   * @returns {this} The current instance for chaining.
+   */
+  css(properties: Record<string, string | number>): this;
+  /**
+   * Get or set CSS properties on the current HTML element.
+   * @param {string | Record<string, string | number>} propertyOrProperties - The CSS property name or object of properties.
+   * @param {string | number} value - The CSS property value (when setting a single property).
+   * @returns {this | string} The current instance for chaining or the property value.
+   */
+  css(propertyOrProperties: string | Record<string, string | number>, value?: string | number): this | string {
+    // Get single property
+    if (typeof propertyOrProperties === 'string' && value === undefined) {
+      return window.getComputedStyle(this.element).getPropertyValue(propertyOrProperties);
+    }
+
+    // Set single property
+    if (typeof propertyOrProperties === 'string' && value !== undefined) {
+      this.element.style.setProperty(propertyOrProperties, value.toString());
+      return this;
+    }
+
+    // Set multiple properties
+    if (typeof propertyOrProperties === 'object') {
+      Object.entries(propertyOrProperties).forEach(([key, val]) => {
+        this.element.style.setProperty(key, val.toString());
+      });
+      return this;
+    }
+
+    return this;
+  }
+
+  /**
+   * Show the element by setting display to its default value.
+   * @returns {this} The current instance for chaining.
+   */
+  show(): this {
+    const display = this.element.style.display;
+    if (display === 'none' || display === '') {
+      this.element.style.display = '';
+    }
+    return this;
+  }
+
+  /**
+   * Hide the element by setting display to none.
+   * @returns {this} The current instance for chaining.
+   */
+  hide(): this {
+    this.element.style.display = 'none';
+    return this;
+  }
+
+  /**
+   * Toggle the visibility of the element.
+   * @returns {this} The current instance for chaining.
+   */
+  toggle(): this {
+    const display = window.getComputedStyle(this.element).display;
+    if (display === 'none') {
+      this.show();
+    } else {
+      this.hide();
+    }
+    return this;
+  }
+
+  /**
+   * Check if the element is visible.
+   * @returns {boolean} True if the element is visible, false otherwise.
+   */
+  isVisible(): boolean {
+    return window.getComputedStyle(this.element).display !== 'none';
+  }
+
+  /**
+   * Get the width of the element.
+   * @returns {number} The width in pixels.
+   */
+  width(): number;
+  /**
+   * Set the width of the element.
+   * @param {number | string} value - The width value (number for pixels, or string with unit).
+   * @returns {this} The current instance for chaining.
+   */
+  width(value: number | string): this;
+  /**
+   * Get or set the width of the element.
+   * @param {number | string} value - The width value (optional).
+   * @returns {number | this} The width in pixels or the current instance for chaining.
+   */
+  width(value?: number | string): number | this {
+    if (value === undefined) {
+      return this.element.getBoundingClientRect().width;
+    }
+    this.element.style.width = typeof value === 'number' ? `${value}px` : value;
+    return this;
+  }
+
+  /**
+   * Get the height of the element.
+   * @returns {number} The height in pixels.
+   */
+  height(): number;
+  /**
+   * Set the height of the element.
+   * @param {number | string} value - The height value (number for pixels, or string with unit).
+   * @returns {this} The current instance for chaining.
+   */
+  height(value: number | string): this;
+  /**
+   * Get or set the height of the element.
+   * @param {number | string} value - The height value (optional).
+   * @returns {number | this} The height in pixels or the current instance for chaining.
+   */
+  height(value?: number | string): number | this {
+    if (value === undefined) {
+      return this.element.getBoundingClientRect().height;
+    }
+    this.element.style.height = typeof value === 'number' ? `${value}px` : value;
+    return this;
+  }
+
+  /**
+   * Get the offset position of the element relative to the document.
+   * @returns {{top: number, left: number}} The offset position.
+   */
+  offset(): { top: number; left: number } {
+    const rect = this.element.getBoundingClientRect();
+    return {
+      top: rect.top + window.scrollY,
+      left: rect.left + window.scrollX,
+    };
+  }
+
+  /**
+   * Get the position of the element relative to its offset parent.
+   * @returns {{top: number, left: number}} The position.
+   */
+  position(): { top: number; left: number } {
+    return {
+      top: this.element.offsetTop,
+      left: this.element.offsetLeft,
+    };
+  }
+
+  /**
+   * Animate the element using the Web Animations API.
+   * @param {Keyframe[] | PropertyIndexedKeyframes} keyframes - The animation keyframes.
+   * @param {number | KeyframeAnimationOptions} options - The animation duration or options.
+   * @returns {Animation} The Animation object.
+   */
+  animate(keyframes: Keyframe[] | PropertyIndexedKeyframes, options?: number | KeyframeAnimationOptions): Animation {
+    return this.element.animate(keyframes, options);
+  }
+
+  /**
+   * Fade in the element.
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when the animation completes.
+   */
+  fadeIn(duration: number = 300): Promise<this> {
+    this.element.style.display = '';
+    const animation = this.element.animate(
+      [
+        { opacity: '0' },
+        { opacity: '1' }
+      ],
+      {
+        duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      }
+    );
+    return animation.finished.then(() => this);
+  }
+
+  /**
+   * Fade out the element.
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when the animation completes.
+   */
+  fadeOut(duration: number = 300): Promise<this> {
+    const animation = this.element.animate(
+      [
+        { opacity: '1' },
+        { opacity: '0' }
+      ],
+      {
+        duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      }
+    );
+    return animation.finished.then(() => {
+      this.element.style.display = 'none';
+      return this;
+    });
+  }
+
+  /**
+   * Slide down the element (show with sliding animation).
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when the animation completes.
+   */
+  slideDown(duration: number = 300): Promise<this> {
+    // Get the target height
+    this.element.style.display = '';
+    this.element.style.overflow = 'hidden';
+    const height = this.element.scrollHeight;
+
+    // Set initial state
+    this.element.style.height = '0px';
+
+    const animation = this.element.animate(
+      [
+        { height: '0px', opacity: '0' },
+        { height: `${height}px`, opacity: '1' }
+      ],
+      {
+        duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      }
+    );
+
+    return animation.finished.then(() => {
+      this.element.style.height = '';
+      this.element.style.overflow = '';
+      return this;
+    });
+  }
+
+  /**
+   * Slide up the element (hide with sliding animation).
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when the animation completes.
+   */
+  slideUp(duration: number = 300): Promise<this> {
+    const height = this.element.scrollHeight;
+    this.element.style.overflow = 'hidden';
+
+    const animation = this.element.animate(
+      [
+        { height: `${height}px`, opacity: '1' },
+        { height: '0px', opacity: '0' }
+      ],
+      {
+        duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      }
+    );
+
+    return animation.finished.then(() => {
+      this.element.style.display = 'none';
+      this.element.style.height = '';
+      this.element.style.overflow = '';
+      return this;
+    });
+  }
+
+  /**
+   * Fade the element to a specific opacity.
+   * @param {number} opacity - The target opacity (0 to 1).
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when the animation completes.
+   */
+  fadeTo(opacity: number, duration: number = 300): Promise<this> {
+    const currentOpacity = window.getComputedStyle(this.element).opacity;
+
+    const animation = this.element.animate(
+      [
+        { opacity: currentOpacity },
+        { opacity: opacity.toString() }
+      ],
+      {
+        duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      }
+    );
+
+    return animation.finished.then(() => this);
   }
 }
 
