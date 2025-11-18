@@ -1,7 +1,25 @@
 {
   "name": "@magik_io/mote",
   "version": "1.6.7",
-  "description": "A singular mote can be a speck of dust, a particle of pollen, or a tiny fragment of a mineral. In the context of this library, a mote is a small, self-contained, and reusable piece of code that can be used to build larger applications.",
+  "description": "A lightweight, TypeScript-first DOM manipulation library with a jQuery-like API for modern web applications. Small, self-contained, and reusable pieces of code that can be composed to build larger applications.",
+  "keywords": [
+    "dom",
+    "dom-manipulation",
+    "typescript",
+    "jquery-like",
+    "fluent-api",
+    "chainable",
+    "lightweight",
+    "browser",
+    "web",
+    "element",
+    "selector",
+    "events",
+    "type-safe",
+    "modern",
+    "esm",
+    "commonjs"
+  ],
   "engines": {
     "node": "22.*.*"
   },
