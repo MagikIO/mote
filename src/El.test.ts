@@ -219,6 +219,7 @@ describe('El', () => {
       createTestElement('div', 'test-div');
       const el = new El('#test-div');
       let eventData: any;
+      // @ts-expect-error -> Testing custom event
       el.on('custom', (e) => {
         eventData = (e as CustomEvent).detail;
       });

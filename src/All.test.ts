@@ -219,6 +219,7 @@ describe('All', () => {
     it('should dispatch custom event on all elements', () => {
       const all = new All('.test-btn');
       let eventCount = 0;
+      // @ts-expect-error -> Testing custom event
       all.on('custom', () => {
         eventCount++;
       });
