@@ -1,6 +1,6 @@
 {
   "name": "@magik_io/mote",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "A lightweight, TypeScript-first DOM manipulation library with a jQuery-like API for modern web applications. Small, self-contained, and reusable pieces of code that can be composed to build larger applications.",
   "keywords": [
     "dom",
