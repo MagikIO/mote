@@ -1,7 +1,8 @@
-import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 import { LintGolem } from '@magik_io/lint_golem';
 
-export default tseslint.config(
+
+export default defineConfig(
   ...new LintGolem({
     rootDir: import.meta.dirname,
     tsconfigPaths: ['tsconfig.json'],

@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@magik_io/lint_golem": "^3.4.0",
+    "@magik_io/lint_golem": "^3.6.0",
     "@vitest/coverage-v8": "^4.0.10",
     "eslint": "^9.39.1",
     "happy-dom": "^20.0.10",

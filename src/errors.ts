@@ -6,7 +6,9 @@ export class MoteError extends Error {
     super(message, options);
     this.name = 'MoteError';
     // Maintains proper stack trace for where our error was thrown (only available on V8)
+    // @ts-expect-error -- Ignore captureStackTrace type issues
     if (Error.captureStackTrace) {
+      // @ts-expect-error -- Ignore captureStackTrace type issues
       Error.captureStackTrace(this, this.constructor);
     }
   }
