@@ -131,29 +131,6 @@ describe('Mote', () => {
     });
   });
 
-  describe('Factory Function', () => {
-    it.skip('should create and append element using mote() function', () => {
-      // This test requires a mote() factory function to be exported
-      // which is not currently available in the module
-      createTestElement('div', 'container');
-      // const { mote } = require('./Mote');
-      // const element = mote('div#test', '#container');
-      // expect(document.querySelector('#container')?.querySelector('#test')).toBeTruthy();
-    });
-
-    it.skip('should execute callback in mote() function', () => {
-      // This test requires a mote() factory function to be exported
-      // which is not currently available in the module
-      createTestElement('div', 'container');
-      // const { mote } = require('./Mote');
-      // let callbackExecuted = false;
-      // mote('div#test', '#container', () => {
-      //   callbackExecuted = true;
-      // });
-      // expect(callbackExecuted).toBe(true);
-    });
-  });
-
   describe('Element Creation Patterns', () => {
     it('should create nested elements', () => {
       createTestElement('div', 'app');
