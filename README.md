@@ -458,6 +458,118 @@ new El(() => document.querySelector('.active'))
   el.dispatchEvent('input');
   ```
 
+#### CSS Manipulation
+
+- **`css(property)`** - Get computed CSS property value
+  ```typescript
+  const color = el.css('color');
+  ```
+
+- **`css(property, value)`** - Set single CSS property
+  ```typescript
+  el.css('color', 'red');
+  el.css('font-size', 16);
+  ```
+
+- **`css(properties)`** - Set multiple CSS properties
+  ```typescript
+  el.css({
+    color: 'red',
+    'font-size': '16px',
+    'background-color': '#f0f0f0'
+  });
+  ```
+
+#### Visibility & Display
+
+- **`show()`** - Show element
+  ```typescript
+  el.show();
+  ```
+
+- **`hide()`** - Hide element
+  ```typescript
+  el.hide();
+  ```
+
+- **`toggle()`** - Toggle visibility
+  ```typescript
+  el.toggle();
+  ```
+
+- **`isVisible()`** - Check if element is visible
+  ```typescript
+  if (el.isVisible()) { /* ... */ }
+  ```
+
+#### Dimensions & Position
+
+- **`width()`** - Get width
+  ```typescript
+  const w = el.width(); // Returns number
+  ```
+
+- **`width(value)`** - Set width
+  ```typescript
+  el.width(100);      // Sets to 100px
+  el.width('50%');    // Sets to 50%
+  ```
+
+- **`height()`** / **`height(value)`** - Get or set height
+  ```typescript
+  const h = el.height();
+  el.height(200);
+  el.height('auto');
+  ```
+
+- **`offset()`** - Get offset position relative to document
+  ```typescript
+  const { top, left } = el.offset();
+  ```
+
+- **`position()`** - Get position relative to offset parent
+  ```typescript
+  const { top, left } = el.position();
+  ```
+
+#### Animations
+
+- **`animate(keyframes, options)`** - Animate element using Web Animations API
+  ```typescript
+  el.animate([
+    { opacity: 0, transform: 'translateY(-20px)' },
+    { opacity: 1, transform: 'translateY(0)' }
+  ], {
+    duration: 300,
+    easing: 'ease-out'
+  });
+  ```
+
+- **`fadeIn(duration?)`** - Fade in element (returns Promise)
+  ```typescript
+  await el.fadeIn(300);
+  ```
+
+- **`fadeOut(duration?)`** - Fade out element (returns Promise)
+  ```typescript
+  await el.fadeOut(300);
+  ```
+
+- **`fadeTo(opacity, duration?)`** - Fade to specific opacity (returns Promise)
+  ```typescript
+  await el.fadeTo(0.5, 300);
+  ```
+
+- **`slideDown(duration?)`** - Slide down element (returns Promise)
+  ```typescript
+  await el.slideDown(300);
+  ```
+
+- **`slideUp(duration?)`** - Slide up element (returns Promise)
+  ```typescript
+  await el.slideUp(300);
+  ```
+
 #### Utilities
 
 - **`if(expression)`** - Conditional chaining
@@ -659,6 +771,61 @@ new All<'button'>('.btn');
   new All('.btns').click();
   ```
 
+#### CSS Manipulation
+
+- **`css(property, value)`** - Set single CSS property on all elements
+  ```typescript
+  new All('.items').css('color', 'red');
+  ```
+
+- **`css(properties)`** - Set multiple CSS properties on all elements
+  ```typescript
+  new All('.items').css({
+    color: 'red',
+    'font-size': '16px'
+  });
+  ```
+
+#### Visibility & Dimensions
+
+- **`show()`** - Show all elements
+  ```typescript
+  new All('.items').show();
+  ```
+
+- **`hide()`** - Hide all elements
+  ```typescript
+  new All('.items').hide();
+  ```
+
+- **`toggle()`** - Toggle visibility of all elements
+  ```typescript
+  new All('.items').toggle();
+  ```
+
+- **`width(value)`** - Set width on all elements
+  ```typescript
+  new All('.items').width(100);
+  new All('.items').width('50%');
+  ```
+
+- **`height(value)`** - Set height on all elements
+  ```typescript
+  new All('.items').height(200);
+  ```
+
+#### Animations
+
+- **`fadeIn(duration?)`** - Fade in all elements (returns Promise)
+  ```typescript
+  await new All('.items').fadeIn(300);
+  ```
+
+- **`fadeOut(duration?)`** - Fade out all elements (returns Promise)
+  ```typescript
+  await new All('.items').fadeOut(300);
+  ```
+
 #### Factory Function
 
 ```typescript
@@ -790,6 +957,73 @@ for (let i = 0; i < 10; i++) {
     .text(`Item ${i}`)
     .appendTo('#container');
 }
+```
+
+### Animations and Transitions
+
+```typescript
+import { El, Mote } from '@magik_io/mote';
+
+// Fade in elements on page load
+const notification = new Mote('div#notification')
+  .addClass('alert')
+  .text('Welcome back!')
+  .hide()
+  .appendToBody();
+
+// Fade in after a delay
+setTimeout(async () => {
+  await notification.fadeIn(300);
+
+  // Auto-hide after 3 seconds
+  setTimeout(async () => {
+    await notification.fadeOut(300);
+    notification.remove();
+  }, 3000);
+}, 500);
+
+// Slide toggle for accordion
+const toggleButton = new El('#accordion-toggle');
+const content = new El('#accordion-content');
+
+toggleButton.on('click', async () => {
+  if (content.isVisible()) {
+    await content.slideUp(300);
+  } else {
+    await content.slideDown(300);
+  }
+});
+
+// Custom animations with Web Animations API
+new El('#animatedBox').animate([
+  { transform: 'translateX(0px)', opacity: 1 },
+  { transform: 'translateX(100px)', opacity: 0.5 },
+  { transform: 'translateX(0px)', opacity: 1 }
+], {
+  duration: 2000,
+  iterations: Infinity,
+  easing: 'ease-in-out'
+});
+
+// CSS manipulation with animations
+new El('#styledElement')
+  .css({
+    'background-color': '#3498db',
+    'transition': 'all 0.3s ease',
+    'transform': 'scale(1)'
+  })
+  .on('mouseenter', (e) => {
+    new El(e.currentTarget as HTMLElement).css({
+      'background-color': '#2980b9',
+      'transform': 'scale(1.05)'
+    });
+  })
+  .on('mouseleave', (e) => {
+    new El(e.currentTarget as HTMLElement).css({
+      'background-color': '#3498db',
+      'transform': 'scale(1)'
+    });
+  });
 ```
 
 ### TypeScript Generic Types

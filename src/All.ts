@@ -87,7 +87,7 @@ export class All<E extends htmlTags = 'input'> {
   public click() {
     this.elements.forEach((element) => {
       element.dispatchEvent(
-        new MouseEvent('click', { view: window, bubbles: true, cancelable: false }),
+        new MouseEvent('click', { bubbles: true, cancelable: false }),
       );
     });
     return this;
@@ -239,6 +239,148 @@ export class All<E extends htmlTags = 'input'> {
       }));
     });
     return this;
+  }
+
+  /**
+   * Set CSS properties on all elements.
+   * @param {string} property - The CSS property name.
+   * @param {string | number} value - The CSS property value.
+   * @returns {this} The current instance for chaining.
+   */
+  public css(property: string, value: string | number): this;
+  /**
+   * Set multiple CSS properties on all elements.
+   * @param {Record<string, string | number>} properties - Object containing CSS properties and values.
+   * @returns {this} The current instance for chaining.
+   */
+  public css(properties: Record<string, string | number>): this;
+  /**
+   * Set CSS properties on all elements.
+   * @param {string | Record<string, string | number>} propertyOrProperties - The CSS property name or object of properties.
+   * @param {string | number} value - The CSS property value (when setting a single property).
+   * @returns {this} The current instance for chaining.
+   */
+  public css(propertyOrProperties: string | Record<string, string | number>, value?: string | number): this {
+    this.elements.forEach((element) => {
+      // Set single property
+      if (typeof propertyOrProperties === 'string' && value !== undefined) {
+        (element as HTMLElement).style.setProperty(propertyOrProperties, value.toString());
+      }
+
+      // Set multiple properties
+      if (typeof propertyOrProperties === 'object') {
+        Object.entries(propertyOrProperties).forEach(([key, val]) => {
+          (element as HTMLElement).style.setProperty(key, val.toString());
+        });
+      }
+    });
+    return this;
+  }
+
+  /**
+   * Show all elements by setting display to their default value.
+   * @returns {this} The current instance for chaining.
+   */
+  public show(): this {
+    this.elements.forEach((element) => {
+      (element as HTMLElement).style.display = '';
+    });
+    return this;
+  }
+
+  /**
+   * Hide all elements by setting display to none.
+   * @returns {this} The current instance for chaining.
+   */
+  public hide(): this {
+    this.elements.forEach((element) => {
+      (element as HTMLElement).style.display = 'none';
+    });
+    return this;
+  }
+
+  /**
+   * Toggle the visibility of all elements.
+   * @returns {this} The current instance for chaining.
+   */
+  public toggle(): this {
+    this.elements.forEach((element) => {
+      const display = window.getComputedStyle(element as HTMLElement).display;
+      (element as HTMLElement).style.display = display === 'none' ? '' : 'none';
+    });
+    return this;
+  }
+
+  /**
+   * Set the width of all elements.
+   * @param {number | string} value - The width value (number for pixels, or string with unit).
+   * @returns {this} The current instance for chaining.
+   */
+  public width(value: number | string): this {
+    this.elements.forEach((element) => {
+      (element as HTMLElement).style.width = typeof value === 'number' ? `${value}px` : value;
+    });
+    return this;
+  }
+
+  /**
+   * Set the height of all elements.
+   * @param {number | string} value - The height value (number for pixels, or string with unit).
+   * @returns {this} The current instance for chaining.
+   */
+  public height(value: number | string): this {
+    this.elements.forEach((element) => {
+      (element as HTMLElement).style.height = typeof value === 'number' ? `${value}px` : value;
+    });
+    return this;
+  }
+
+  /**
+   * Fade in all elements.
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when all animations complete.
+   */
+  public fadeIn(duration: number = 300): Promise<this> {
+    const animations = Array.from(this.elements).map((element) => {
+      (element as HTMLElement).style.display = '';
+      return (element as HTMLElement).animate(
+        [
+          { opacity: '0' },
+          { opacity: '1' }
+        ],
+        {
+          duration,
+          easing: 'ease-in-out',
+          fill: 'forwards'
+        }
+      ).finished;
+    });
+    return Promise.all(animations).then(() => this);
+  }
+
+  /**
+   * Fade out all elements.
+   * @param {number} duration - The animation duration in milliseconds (default: 300).
+   * @returns {Promise<this>} A promise that resolves when all animations complete.
+   */
+  public fadeOut(duration: number = 300): Promise<this> {
+    const animations = Array.from(this.elements).map((element) => {
+      const animation = (element as HTMLElement).animate(
+        [
+          { opacity: '1' },
+          { opacity: '0' }
+        ],
+        {
+          duration,
+          easing: 'ease-in-out',
+          fill: 'forwards'
+        }
+      );
+      return animation.finished.then(() => {
+        (element as HTMLElement).style.display = 'none';
+      });
+    });
+    return Promise.all(animations).then(() => this);
   }
 };
 
