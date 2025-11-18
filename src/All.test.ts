@@ -1,6 +1,22 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest';
 import { All } from './All';
 import { createTestElement, cleanupTestElements } from './test-utils';
+
+// Mock the animate API for jsdom
+beforeAll(() => {
+  HTMLElement.prototype.animate = vi.fn().mockImplementation(function(keyframes, options) {
+    const animation = {
+      finished: Promise.resolve(),
+      cancel: vi.fn(),
+      finish: vi.fn(),
+      pause: vi.fn(),
+      play: vi.fn(),
+      reverse: vi.fn(),
+      updatePlaybackRate: vi.fn(),
+    };
+    return animation as unknown as Animation;
+  });
+});
 
 describe('All', () => {
   afterEach(() => {
